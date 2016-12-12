@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Velocity Vortex Scorekeeper</string>
+    <string name="title_activity_main">Velocity Vortex Scorekeeper</string>
+    <string name="title_activity_scoring_screen">Scoring Screen</string>
+
+    <string-array name="scoring_styles">
+        <item>Red Corner</item>
+        <item>Red Center</item>
+        <item>Red</item>
+        <item>Blue Corner</item>
+        <item>Blue Center</item>
+        <item>Blue</item>
+        <item>2 Centers</item>
+        <item>2 Corners</item>
+        <item>All Goals</item>
+    </string-array>
+</resources>
