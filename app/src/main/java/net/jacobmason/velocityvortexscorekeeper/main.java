@@ -62,7 +62,7 @@ public class main extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        mContentView = findViewById(R.id.fullscreen_content);
+        mContentView = findViewById(R.id.scoring_table);
 
         Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
         final Intent swapToScoringActivity = new Intent(this, ScoringActivity.class);
