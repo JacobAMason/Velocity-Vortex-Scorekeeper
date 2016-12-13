@@ -12,6 +12,7 @@
             android:name=".main"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +25,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_scoring_screen"
             android:parentActivityName=".main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
