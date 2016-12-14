@@ -8,12 +8,21 @@
     tools:context="net.jacobmason.velocityvortexscorekeeper.main">
 
     <Spinner
-        android:id="@+id/scoring_style"
+        android:id="@+id/spinner_scoringStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:entries="@array/scoring_styles"
         android:spinnerMode="dialog" />
+
+    <EditText
+        android:id="@+id/editText_ipAddress"
+        android:inputType="phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/spinner_scoringStyle"
+        android:hint="IP address" />
 
     <Button
         android:id="@+id/button_startScoring"

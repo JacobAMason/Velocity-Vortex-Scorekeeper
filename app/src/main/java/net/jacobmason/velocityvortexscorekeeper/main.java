@@ -6,9 +6,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
+
+import java.util.regex.Pattern;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -55,6 +60,9 @@ public class main extends AppCompatActivity {
             hide();
         }
     };
+    private static final Pattern PARTIAL_IP_ADDRESS =
+            Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}"+
+                    "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])){0,1}$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +77,25 @@ public class main extends AppCompatActivity {
         button_startScoring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String scoring_style = ((Spinner) findViewById(R.id.scoring_style)).getSelectedItem().toString();
+                String scoring_style = ((Spinner) findViewById(R.id.spinner_scoringStyle)).getSelectedItem().toString();
                 swapToScoringActivity.putExtra("scoring_style", scoring_style);
                 startActivity(swapToScoringActivity);
+            }
+        });
+
+        EditText editText_ipAddress = (EditText) findViewById(R.id.editText_ipAddress);
+        editText_ipAddress.addTextChangedListener(new TextWatcher() {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void beforeTextChanged(CharSequence s,int start,int count,int after) {}
+
+            private String mPreviousText = "";
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(PARTIAL_IP_ADDRESS.matcher(s).matches()) {
+                    mPreviousText = s.toString();
+                } else {
+                    s.replace(0, s.length(), mPreviousText);
+                }
             }
         });
     }
