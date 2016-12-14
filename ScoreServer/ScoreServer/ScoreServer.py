@@ -1,6 +1,5 @@
 import json
 
-import time
 from bottle import static_file, Bottle, request, abort
 
 from ScoreKeeper import ScoreKeeper
@@ -14,9 +13,15 @@ def hello():
     return "Hello World"
 
 
+@app.route('/static/<filename:path>')
+def send_static(filename):
+    print "Trying to load", filename
+    return static_file(filename, root="static")
+
+
 @app.get("/scorekeeper")
 def get_scorekeeper():
-    return static_file("scorekeeper.html", "pages")
+    return static_file("scorekeeper.html", root="static")
 
 
 connections = set()
@@ -58,7 +63,11 @@ def post_score():
 
 
 def update_clients():
-    [wsock.send(json.dumps(scorekeeper.get_scores())) for wsock in connections]
+    for wsock in list(connections):
+        try:
+            wsock.send(json.dumps(scorekeeper.get_scores()))
+        except WebSocketError:
+            connections.remove(wsock)
 
 
 if __name__ == '__main__':

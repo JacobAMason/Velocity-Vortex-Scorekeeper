@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+
+    <script type="text/javascript">
+    var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
+    ws.onopen = function() {
+        ws.send("Hello, world");
+    };
+    ws.onmessage = function (evt) {
+        var data = JSON.parse(evt.data);
+        var tableData = new Array();
+        tableData.push("<thead><tr><th>Red Alliance</th><th>Blue Alliance</th></tr></thead><tbody><tr><td>Corner Vortex - ");
+        tableData.push(data.red.corner);
+        tableData.push("</td><td>Corner Vortex - ");
+        tableData.push(data.blue.corner);
+        tableData.push("</td></tr><tr><td>Center Vortex - ");
+        tableData.push(data.red.center);
+        tableData.push("</td><td>Center Vortex - ");
+        tableData.push(data.blue.center);
+        tableData.push("</td></tr></tbody>");
+
+        $("#scores").html(tableData.join(""));
+    };
+
+
+    </script>
+</head>
+<body>
+<div class="container-fluid">
+    <h1>Scores</h1>
+    <div class="row">
+        <div class="col-sm-12">
+            <table id="scores" class='table-bordered'></table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
