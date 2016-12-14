@@ -3,7 +3,7 @@
     android:id="@+id/scoring_table"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f57e25"
+    android:background="@color/FTCorange"
     android:orientation="vertical"
     tools:context="net.jacobmason.velocityvortexscorekeeper.main">
 

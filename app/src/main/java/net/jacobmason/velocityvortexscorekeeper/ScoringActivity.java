@@ -1,7 +1,6 @@
 package net.jacobmason.velocityvortexscorekeeper;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
@@ -13,6 +12,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Locale;
 
@@ -22,6 +30,26 @@ import java.util.Locale;
  */
 public class ScoringActivity extends AppCompatActivity {
     private TableLayout scoringTable;
+    private String webserverIP;
+
+    @Override
+    public void onBackPressed() {
+        for (int i = 0; i < scoringTable.getChildCount(); ++i) {
+            Log.d("ScoringActivity", String.valueOf(((ScoringButton) scoringTable.getChildAt(i)).getScore()));
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // This ID represents the Home or Up button.
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,73 +70,91 @@ public class ScoringActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        webserverIP = getIntent().getStringExtra("webserverIP");
+
         View topPadding = findViewById(R.id.topPadding);
         View bottomPadding = findViewById(R.id.bottomPadding);
         switch (getIntent().getStringExtra("scoring_style")) {
             case "Red":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Center Goal", R.color.red));
-                scoringTable.addView(new ScoringButton(this, "Corner Goal", R.color.red));
+                scoringTable.addView(new ScoringButton(this, "Red", "Center"));
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.red);
                 break;
             case "Red Corner":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Corner Goal", R.color.red));
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.red);
                 break;
             case "Red Center":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Center Goal", R.color.red));
+                scoringTable.addView(new ScoringButton(this, "Red", "Center"));
                 bottomPadding.setBackgroundResource(R.color.red);
                 break;
 
             case "Blue":
                 topPadding.setBackgroundResource(R.color.blue);
-                scoringTable.addView(new ScoringButton(this, "Center Goal", R.color.blue));
-                scoringTable.addView(new ScoringButton(this, "Corner Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
             case "Blue Corner":
                 topPadding.setBackgroundResource(R.color.blue);
-                scoringTable.addView(new ScoringButton(this, "Corner Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
             case "Blue Center":
                 topPadding.setBackgroundResource(R.color.blue);
-                scoringTable.addView(new ScoringButton(this, "Center Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
 
             case "2 Corners":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Red Corner Goal", R.color.red));
-                scoringTable.addView(new ScoringButton(this, "Blue Corner Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
 
             case "2 Centers":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Red Center Goal", R.color.red));
-                scoringTable.addView(new ScoringButton(this, "Blue Center Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Red", "Center"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
 
             case "All Goals":
                 topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Red Center Goal", R.color.red));
-                scoringTable.addView(new ScoringButton(this, "Red Corner Goal", R.color.red));
-                scoringTable.addView(new ScoringButton(this, "Blue Center Goal", R.color.blue));
-                scoringTable.addView(new ScoringButton(this, "Blue Corner Goal", R.color.blue));
+                scoringTable.addView(new ScoringButton(this, "Red", "Center"));
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
         }
     }
 
     class ScoringButton extends TableRow {
+        private String alliance;
+        private String goal;
         private int score = 0;
 
-        public ScoringButton(Context context, final String goalName, int backgroundColor) {
+        public ScoringButton(Context context, final String alliance, String goal) {
             super(context);
+            this.alliance = alliance;
+            this.goal = goal;
+            final String goalName = String.format(Locale.US, "%s %s Goal", alliance, goal);
+            int backgroundColor;
+            switch (alliance) {
+                case "Red":
+                    backgroundColor = R.color.red;
+                    break;
+                case "Blue":
+                    backgroundColor = R.color.blue;
+                    break;
+                default:
+                    backgroundColor = R.color.FTCorange;
+            }
 
             TableLayout.LayoutParams params = new TableLayout.LayoutParams();
             params.weight = 1;
@@ -122,6 +168,7 @@ public class ScoringActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     button.setText(String.format(Locale.US, "%s\n%d", goalName, ++score));
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                    update_score();
                 }
             });
             button.setOnLongClickListener(new View.OnLongClickListener() {
@@ -130,33 +177,44 @@ public class ScoringActivity extends AppCompatActivity {
                     if (score > 0) {
                         button.setText(String.format(Locale.US, "%s\n%d", goalName, --score));
                     }
+                    update_score();
                     return true;
                 }
             });
             this.addView(button);
         }
 
+        private void update_score() {
+            webserverIP = "192.168.1.109";
+            final String address = String.format(Locale.US, "http://%s:3486/scorekeeper/submit", webserverIP);
+            try {
+                JSONObject params = new JSONObject();
+                params.put("alliance", alliance.toLowerCase());
+                params.put("goal", goal.toLowerCase());
+                params.put("score", score);
+
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, address, params,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d("ScoringActivity", error.toString());
+                                Toast.makeText(getApplicationContext(), "Error sending score to server", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                ApplicationController.get_instance().getRequestQueue().add(request);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         public int getScore() {
             return score;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        for (int i = 0; i < scoringTable.getChildCount(); ++i) {
-            Log.d("ScoringActivity", String.valueOf(((ScoringButton) scoringTable.getChildAt(i)).getScore()));
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            // This ID represents the Home or Up button.
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
