@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -70,7 +71,7 @@ public class ScoringActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        webserverIP = getIntent().getStringExtra("webserverIP");
+        webserverIP = getIntent().getStringExtra("ip_address");
 
         View topPadding = findViewById(R.id.topPadding);
         View bottomPadding = findViewById(R.id.bottomPadding);
@@ -185,31 +186,32 @@ public class ScoringActivity extends AppCompatActivity {
         }
 
         private void update_score() {
-            webserverIP = "192.168.1.109";
-            final String address = String.format(Locale.US, "http://%s:3486/scorekeeper/submit", webserverIP);
-            try {
-                JSONObject params = new JSONObject();
-                params.put("alliance", alliance.toLowerCase());
-                params.put("goal", goal.toLowerCase());
-                params.put("score", score);
+            if (!webserverIP.isEmpty()) {
+                final String address = String.format(Locale.US, "http://%s:3486/scorekeeper/submit", webserverIP);
+                try {
+                    JSONObject params = new JSONObject();
+                    params.put("alliance", alliance.toLowerCase());
+                    params.put("goal", goal.toLowerCase());
+                    params.put("score", score);
 
-                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, address, params,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, address, params,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
 
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d("ScoringActivity", error.toString());
-                                Toast.makeText(getApplicationContext(), "Error sending score to server", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                ApplicationController.get_instance().getRequestQueue().add(request);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.d("ScoringActivity", error.toString());
+                                    Toast.makeText(getApplicationContext(), "Error sending score to server\nCheck your IP address and connectivity", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    ApplicationController.get_instance().getRequestQueue().add(request);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

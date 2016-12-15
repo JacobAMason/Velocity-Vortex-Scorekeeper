@@ -8,10 +8,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.regex.Pattern;
 
@@ -72,18 +74,7 @@ public class main extends AppCompatActivity {
 
         mContentView = findViewById(R.id.scoring_table);
 
-        Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
-        final Intent swapToScoringActivity = new Intent(this, ScoringActivity.class);
-        button_startScoring.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String scoring_style = ((Spinner) findViewById(R.id.spinner_scoringStyle)).getSelectedItem().toString();
-                swapToScoringActivity.putExtra("scoring_style", scoring_style);
-                startActivity(swapToScoringActivity);
-            }
-        });
-
-        EditText editText_ipAddress = (EditText) findViewById(R.id.editText_ipAddress);
+        final EditText editText_ipAddress = (EditText) findViewById(R.id.editText_ipAddress);
         editText_ipAddress.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void beforeTextChanged(CharSequence s,int start,int count,int after) {}
@@ -96,6 +87,23 @@ public class main extends AppCompatActivity {
                 } else {
                     s.replace(0, s.length(), mPreviousText);
                 }
+            }
+        });
+
+        Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
+        final Intent swapToScoringActivity = new Intent(this, ScoringActivity.class);
+        button_startScoring.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String ipAddress = editText_ipAddress.getText().toString();
+                if (!ipAddress.isEmpty() && !Patterns.IP_ADDRESS.matcher(ipAddress).matches()) {
+                    Toast.makeText(getApplicationContext(), "Not a valid IP address", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String scoring_style = ((Spinner) findViewById(R.id.spinner_scoringStyle)).getSelectedItem().toString();
+                swapToScoringActivity.putExtra("scoring_style", scoring_style);
+                swapToScoringActivity.putExtra("ip_address", ipAddress);
+                startActivity(swapToScoringActivity);
             }
         });
     }

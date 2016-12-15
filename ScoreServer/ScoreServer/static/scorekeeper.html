@@ -16,14 +16,14 @@
     ws.onmessage = function (evt) {
         var data = JSON.parse(evt.data);
         var tableData = new Array();
-        tableData.push("<thead><tr><th>Red Alliance</th><th>Blue Alliance</th></tr></thead><tbody><tr><td>Corner Vortex - ");
-        tableData.push(data.red.corner);
-        tableData.push("</td><td>Corner Vortex - ");
-        tableData.push(data.blue.corner);
-        tableData.push("</td></tr><tr><td>Center Vortex - ");
+        tableData.push("<thead><tr><th>Red Alliance</th><th>Blue Alliance</th></tr></thead><tbody><tr><td>Center Vortex - ");
         tableData.push(data.red.center);
         tableData.push("</td><td>Center Vortex - ");
         tableData.push(data.blue.center);
+        tableData.push("</td></tr><tr><td>Corner Vortex - ");
+        tableData.push(data.red.corner);
+        tableData.push("</td><td>Corner Vortex - ");
+        tableData.push(data.blue.corner);
         tableData.push("</td></tr></tbody>");
 
         $("#scores").html(tableData.join(""));
