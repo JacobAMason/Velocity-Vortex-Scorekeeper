@@ -4,12 +4,12 @@
     <string name="title_activity_scoring_screen">Scoring Screen</string>
 
     <string-array name="scoring_styles">
-        <item>Red Corner</item>
-        <item>Red Center</item>
         <item>Red</item>
-        <item>Blue Corner</item>
-        <item>Blue Center</item>
+        <item>Red Center</item>
+        <item>Red Corner</item>
         <item>Blue</item>
+        <item>Blue Center</item>
+        <item>Blue Corner</item>
         <item>2 Centers</item>
         <item>2 Corners</item>
         <item>All Goals</item>

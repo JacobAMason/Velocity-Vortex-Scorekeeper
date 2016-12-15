@@ -82,14 +82,14 @@ public class ScoringActivity extends AppCompatActivity {
                 scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.red);
                 break;
-            case "Red Corner":
-                topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
-                bottomPadding.setBackgroundResource(R.color.red);
-                break;
             case "Red Center":
                 topPadding.setBackgroundResource(R.color.red);
                 scoringTable.addView(new ScoringButton(this, "Red", "Center"));
+                bottomPadding.setBackgroundResource(R.color.red);
+                break;
+            case "Red Corner":
+                topPadding.setBackgroundResource(R.color.red);
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.red);
                 break;
 
@@ -99,20 +99,13 @@ public class ScoringActivity extends AppCompatActivity {
                 scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
-            case "Blue Corner":
-                topPadding.setBackgroundResource(R.color.blue);
-                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
-                bottomPadding.setBackgroundResource(R.color.blue);
-                break;
             case "Blue Center":
                 topPadding.setBackgroundResource(R.color.blue);
                 scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
-
-            case "2 Corners":
-                topPadding.setBackgroundResource(R.color.red);
-                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
+            case "Blue Corner":
+                topPadding.setBackgroundResource(R.color.blue);
                 scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
@@ -121,6 +114,13 @@ public class ScoringActivity extends AppCompatActivity {
                 topPadding.setBackgroundResource(R.color.red);
                 scoringTable.addView(new ScoringButton(this, "Red", "Center"));
                 scoringTable.addView(new ScoringButton(this, "Blue", "Center"));
+                bottomPadding.setBackgroundResource(R.color.blue);
+                break;
+
+            case "2 Corners":
+                topPadding.setBackgroundResource(R.color.red);
+                scoringTable.addView(new ScoringButton(this, "Red", "Corner"));
+                scoringTable.addView(new ScoringButton(this, "Blue", "Corner"));
                 bottomPadding.setBackgroundResource(R.color.blue);
                 break;
 
