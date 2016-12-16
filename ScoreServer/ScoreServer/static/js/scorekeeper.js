@@ -1,5 +1,14 @@
 $(document).ready(function() {
 
+String.prototype.toMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var minutes = Math.floor(sec_num / 60);
+    var seconds = sec_num - (minutes * 60);
+
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return minutes+':'+seconds;
+}
+
 var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
 ws.onopen = function() {
 };
@@ -7,6 +16,10 @@ ws.onmessage = function (evt) {
     var data = JSON.parse(evt.data);
 
     if (data.clock) {
+        if (data.clock.time) {
+            console.log(data.clock.time.toMMSS());
+            $("#clock").html(data.clock.time.toMMSS());
+        }
         if (data.clock.time === "120") {
             $("#start-autonomous").prop('disabled', true);
             $("#start-teleop").prop('disabled', false);
@@ -55,6 +68,7 @@ $("#start-autonomous").click(function () {
     $("#start-teleop").prop('disabled', true);
     $("#reset-clock").prop('disabled', true);
     $("#stop-clock").prop('disabled', false);
+    $("#clock").html("2:30");
     ws.send(JSON.stringify({"clock-control": "start-autonomous"}));
 })
 
@@ -77,5 +91,10 @@ $("#stop-clock").click(function () {
     $("#stop-clock").prop('disabled', true);
     ws.send(JSON.stringify({"clock-control": "stop-clock"}));
 })
+
+$('[data-toggle=confirmation]').confirmation({
+  rootSelector: '[data-toggle=confirmation]',
+  // other options
+});
 
 });

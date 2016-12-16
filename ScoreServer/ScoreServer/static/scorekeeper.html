@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="js/jquery-3.1.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-confirmation.min.js"></script>
     <script src="js/scorekeeper.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
@@ -14,17 +15,45 @@
 </head>
 <body>
 <div class="container-fluid">
-    <h1>Scorekeeper</h1>
+    <div class="page-header">
+        <h1>Scorekeeper</h1>
+    </div>
     <div class="row">
         <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12">
-            <table id="scores" class='table table-bordered text-center'></table>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <font size="5">Scores</font>
+                    <button class="btn btn-danger pull-right" data-toggle="confirmation"
+                            data-placement="left" data-popout="true"
+                            data-btn-ok-label="Erase" data-btn-ok-icon="glyphicon glyphicon-erase"
+                            data-btn-ok-class="btn-success"
+                            data-btn-cancel-label="Cancel" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"
+                            data-btn-cancel-class="btn-danger"
+                            data-title="Are you sure?">
+                        Clear Scores
+                    </button>
+                </div>
+                <table id="scores" class='table table-bordered text-center'></table>
+            </div>
         </div>
     </div>
-    <div class="container-fluid text-center">
-        <button id="start-autonomous" type="button" class="btn btn-success">Start Autonomous</button>
-        <button id="start-teleop" type="button" class="btn btn-primary">Start TeleOp</button>
-        <button id="reset-clock" type="button" class="btn btn-warning">Reset Clock</button>
-        <button id="stop-clock" type="button" class="btn btn-danger" disabled>Stop Clock</button>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <font size="5">Game Clock</font>
+                </div>
+                <div id="clock" class="panel-body">2:30</div>
+                <div class="text-center panel-footer">
+                    <div class="btn-group btn-group-lg" role="group">
+                        <button id="start-autonomous" type="button" class="btn btn-success">Start Autonomous</button>
+                        <button id="start-teleop" type="button" class="btn btn-primary">Start TeleOp</button>
+                        <button id="reset-clock" type="button" class="btn btn-warning">Reset Clock</button>
+                        <button id="stop-clock" type="button" class="btn btn-danger" disabled>Stop Clock</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

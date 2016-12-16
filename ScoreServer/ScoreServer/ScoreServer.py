@@ -2,6 +2,10 @@ import json
 
 from bottle import static_file, Bottle, request, abort
 
+from gevent.pywsgi import WSGIServer
+from geventwebsocket import WebSocketError
+from geventwebsocket.handler import WebSocketHandler
+
 from ScoreKeeper import ScoreKeeper
 
 app = Bottle()
@@ -69,10 +73,6 @@ def send_static(filename):
 
 
 if __name__ == '__main__':
-    from gevent.pywsgi import WSGIServer
-    from geventwebsocket import WebSocketError
-    from geventwebsocket.handler import WebSocketHandler
-
     server = WSGIServer(("0.0.0.0", 3486), application=app,
                         handler_class=WebSocketHandler)
     server.serve_forever()
