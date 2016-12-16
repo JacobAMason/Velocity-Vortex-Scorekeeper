@@ -16,27 +16,38 @@ ws.onmessage = function (evt) {
     var data = JSON.parse(evt.data);
 
     if (data.clock) {
-        if (data.clock.time) {
-            console.log(data.clock.time.toMMSS());
+        if (data.clock.control) {
+            if (data.clock.control === "start-autonomous") {
+                $("#clock").html("2:30");
+            } else if (data.clock.control === "start-teleop") {
+                $("#clock").html("2:00");
+            } else if (data.clock.control === "reset-clock") {
+                $("#clock").html("2:30");
+            } else if (data.clock.control === "stop-clock") {
+                $("#clock").html("<font color='red'>0:00</font>");
+                $("#start-autonomous").prop('disabled', false);
+                $("#start-teleop").prop('disabled', false);
+                $("#reset-clock").prop('disabled', false);
+            }
+        } else if (data.clock.time) {
             $("#clock").html(data.clock.time.toMMSS());
-        }
-        if (data.clock.time === "120") {
             $("#start-autonomous").prop('disabled', true);
-            $("#start-teleop").prop('disabled', false);
-            $("#reset-clock").prop('disabled', false);
+            $("#start-teleop").prop('disabled', true);
+            $("#reset-clock").prop('disabled', true);
             $("#stop-clock").prop('disabled', false);
-        }
-        if (data.clock.time === "0") {
-            $("#start-autonomous").prop('disabled', false);
-            $("#start-teleop").prop('disabled', false);
-            $("#reset-clock").prop('disabled', false);
-            $("#stop-clock").prop('disabled', true);
-        }
-        if (data.clock.control === "stop-clock") {
-            $("#start-autonomous").prop('disabled', false);
-            $("#start-teleop").prop('disabled', false);
-            $("#reset-clock").prop('disabled', false);
-            $("#stop-clock").prop("disabled", true);
+
+            if (data.clock.time === "120") {
+                $("#start-autonomous").prop('disabled', true);
+                $("#start-teleop").prop('disabled', false);
+                $("#reset-clock").prop('disabled', false);
+                $("#stop-clock").prop('disabled', true);
+            }
+            if (data.clock.time === "0") {
+                $("#start-autonomous").prop('disabled', false);
+                $("#start-teleop").prop('disabled', false);
+                $("#reset-clock").prop('disabled', false);
+                $("#stop-clock").prop('disabled', true);
+            }
         }
     } else {
         var tableData = new Array();
@@ -64,11 +75,6 @@ ws.onmessage = function (evt) {
 
 
 $("#start-autonomous").click(function () {
-    $("#start-autonomous").prop('disabled', true);
-    $("#start-teleop").prop('disabled', true);
-    $("#reset-clock").prop('disabled', true);
-    $("#stop-clock").prop('disabled', false);
-    $("#clock").html("2:30");
     ws.send(JSON.stringify({"clock-control": "start-autonomous"}));
 })
 

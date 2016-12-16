@@ -37,6 +37,7 @@ ws.onmessage = function (evt) {
                 $("#clock").html("2:30");
                 audio_startMatch.play();
             } else if (data.clock.control === "start-teleop") {
+                $("#clock").html("2:00");
                 audio_startMatch.play();
             } else if (data.clock.control === "reset-clock") {
                 $("#clock").html("2:30");
