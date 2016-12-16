@@ -13,30 +13,34 @@ def hello():
     return "Hello World"
 
 
-connections = set()
 @app.route('/scorekeeper/ws')
 def handle_websocket():
     wsock = request.environ.get('wsgi.websocket')
     if not wsock:
         abort(400, 'Expected WebSocket request.')
-    connections.add(wsock)
     wsock.send(scorekeeper.get_score_json())
+    scorekeeper.connections.add(wsock)
 
     while True:
         try:
             data = wsock.receive()
-            print data
+            if data is not None:
+                data = json.loads(data)
+                if "clock-control" in data:
+                    scorekeeper.clock_control(data["clock-control"])
+                if "clock" in data:
+                    print "Clock", data["clock"]
+                    scorekeeper.connections.websocket_broadcast(json.dumps(data))
+        except TypeError as e:
+            print "Fumbled response:", e
         except WebSocketError:
-            print "Socket closed"
             break
-
 
 @app.post("/scorekeeper/reset")
 def post_reset():
     reset = request.json.get('reset')
     if reset is 'reset':
         scorekeeper.reset()
-        websocket_broadcast(scorekeeper.get_score_json())
     else:
         abort(400)
 
@@ -48,18 +52,10 @@ def post_score():
     goal = request.json.get('goal')
     score = request.json.get('score')
     if scorekeeper.update_score(gameMode, alliance, goal, score):
-        websocket_broadcast(scorekeeper.get_score_json())
         return json.dumps({"status": "ok"})
     else:
         abort(400, "Score POST didn't contain correct keys")
 
-
-def websocket_broadcast(jsonData):
-    for wsock in list(connections):
-        try:
-            wsock.send(json)
-        except WebSocketError:
-            connections.remove(wsock)
 
 
 @app.route('/<filename:path>')
