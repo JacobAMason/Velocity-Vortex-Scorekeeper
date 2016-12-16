@@ -12,7 +12,10 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;
@@ -72,7 +75,7 @@ public class main extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        mContentView = findViewById(R.id.scoring_table);
+        mContentView = findViewById(R.id.relativeLayout);
 
         final EditText editText_ipAddress = (EditText) findViewById(R.id.editText_ipAddress);
         editText_ipAddress.addTextChangedListener(new TextWatcher() {
@@ -90,7 +93,8 @@ public class main extends AppCompatActivity {
             }
         });
 
-        Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
+        final RadioGroup switch_gameMode = (RadioGroup) findViewById(R.id.radioGroup_gameMode);
+        final Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
         final Intent swapToScoringActivity = new Intent(this, ScoringActivity.class);
         button_startScoring.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,9 +104,11 @@ public class main extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Not a valid IP address", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                String game_mode = ((RadioButton) findViewById(switch_gameMode.getCheckedRadioButtonId())).getText().toString();
                 String scoring_style = ((Spinner) findViewById(R.id.spinner_scoringStyle)).getSelectedItem().toString();
-                swapToScoringActivity.putExtra("scoring_style", scoring_style);
                 swapToScoringActivity.putExtra("ip_address", ipAddress);
+                swapToScoringActivity.putExtra("game_mode", game_mode);
+                swapToScoringActivity.putExtra("scoring_style", scoring_style);
                 startActivity(swapToScoringActivity);
             }
         });

@@ -13,17 +13,6 @@ def hello():
     return "Hello World"
 
 
-@app.route('/static/<filename:path>')
-def send_static(filename):
-    print "Trying to load", filename
-    return static_file(filename, root="static")
-
-
-@app.get("/scorekeeper")
-def get_scorekeeper():
-    return static_file("scorekeeper.html", root="static")
-
-
 connections = set()
 @app.route('/scorekeeper/ws')
 def handle_websocket():
@@ -31,12 +20,14 @@ def handle_websocket():
     if not wsock:
         abort(400, 'Expected WebSocket request.')
     connections.add(wsock)
+    wsock.send(scorekeeper.get_score_json())
 
     while True:
         try:
-            message = wsock.receive()
-            wsock.send("Your message was: %r" % message)
+            data = wsock.receive()
+            print data
         except WebSocketError:
+            print "Socket closed"
             break
 
 
@@ -45,29 +36,40 @@ def post_reset():
     reset = request.json.get('reset')
     if reset is 'reset':
         scorekeeper.reset()
-        update_clients()
+        websocket_broadcast(scorekeeper.get_score_json())
     else:
         abort(400)
 
 
 @app.post("/scorekeeper/submit")
 def post_score():
+    gameMode = request.json.get('gameMode')
     alliance = request.json.get('alliance')
     goal = request.json.get('goal')
     score = request.json.get('score')
-    if scorekeeper.update_score(alliance, goal, score):
-        update_clients()
+    if scorekeeper.update_score(gameMode, alliance, goal, score):
+        websocket_broadcast(scorekeeper.get_score_json())
         return json.dumps({"status": "ok"})
     else:
         abort(400, "Score POST didn't contain correct keys")
 
 
-def update_clients():
+def websocket_broadcast(jsonData):
     for wsock in list(connections):
         try:
-            wsock.send(json.dumps(scorekeeper.get_scores()))
+            wsock.send(json)
         except WebSocketError:
             connections.remove(wsock)
+
+
+@app.route('/<filename:path>')
+def send_static(filename):
+    if filename.startswith("static/"):
+        filename = filename[7:]
+    if '.' not in filename:
+        filename += ".html"
+    print "Trying to load", filename
+    return static_file(filename, root="static")
 
 
 if __name__ == '__main__':

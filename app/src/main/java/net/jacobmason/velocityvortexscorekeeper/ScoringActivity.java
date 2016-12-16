@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -32,6 +31,7 @@ import java.util.Objects;
 public class ScoringActivity extends AppCompatActivity {
     private TableLayout scoringTable;
     private String webserverIP;
+    private String gameMode;
 
     @Override
     public void onBackPressed() {
@@ -59,7 +59,7 @@ public class ScoringActivity extends AppCompatActivity {
         Log.d("ScoringActivity", "Created Activity");
 
         setContentView(R.layout.activity_scoring_screen);
-        scoringTable = (TableLayout) findViewById(R.id.scoring_table);
+        scoringTable = (TableLayout) findViewById(R.id.relativeLayout);
         scoringTable.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -72,6 +72,7 @@ public class ScoringActivity extends AppCompatActivity {
         }
 
         webserverIP = getIntent().getStringExtra("ip_address");
+        gameMode = getIntent().getStringExtra("game_mode");
 
         View topPadding = findViewById(R.id.topPadding);
         View bottomPadding = findViewById(R.id.bottomPadding);
@@ -190,6 +191,7 @@ public class ScoringActivity extends AppCompatActivity {
                 final String address = String.format(Locale.US, "http://%s:3486/scorekeeper/submit", webserverIP);
                 try {
                     JSONObject params = new JSONObject();
+                    params.put("gameMode", gameMode.toLowerCase());
                     params.put("alliance", alliance.toLowerCase());
                     params.put("goal", goal.toLowerCase());
                     params.put("score", score);
