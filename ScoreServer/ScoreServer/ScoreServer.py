@@ -43,7 +43,7 @@ def handle_websocket():
 @app.post("/scorekeeper/reset")
 def post_reset():
     reset = request.json.get('reset')
-    if reset is 'reset':
+    if reset == 'reset':
         scorekeeper.reset()
     else:
         abort(400)

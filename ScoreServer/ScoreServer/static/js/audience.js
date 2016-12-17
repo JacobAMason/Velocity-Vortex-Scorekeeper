@@ -1,7 +1,9 @@
-var audio_startMatch = new Audio('sound/STARTMATCH.wav');
-var audio_endMatch = new Audio('sound/ENDMATCH.wav');
-var audio_30SecondsLeft = new Audio('sound/3BELLS.wav')
-var audio_fogHornMatch = new Audio('sound/FOGHORN.wav');
+var audio_startAutonomous = new Audio('sound/startauto.wav');
+var audio_endAutonomous = new Audio('sound/endauto.wav');
+var audio_startTeleop = new Audio('sound/startteleop.wav');
+var audio_endTeleop = new Audio('sound/endteleop.wav');
+var audio_30SecondsLeft = new Audio('sound/30sec.wav');
+var audio_eStop = new Audio('sound/estop.wav');
 var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
 
 $(document).ready(function(){
@@ -35,21 +37,23 @@ ws.onmessage = function (evt) {
         if (data.clock.control) {
             if (data.clock.control === "start-autonomous") {
                 $("#clock").html("2:30");
-                audio_startMatch.play();
+                audio_startAutonomous.play();
             } else if (data.clock.control === "start-teleop") {
                 $("#clock").html("2:00");
-                audio_startMatch.play();
+                audio_startTeleop.play();
             } else if (data.clock.control === "reset-clock") {
                 $("#clock").html("2:30");
             } else if (data.clock.control === "stop-clock") {
                 $("#clock").html("<font color='red'>0:00</font>");
-                audio_fogHornMatch.play();
+                audio_eStop.play();
             }
         } else if (data.clock.time) {
             $("#clock").html(data.clock.time.toMMSS());
-            if (data.clock.time === "120" || data.clock.time === "0") {
-                audio_endMatch.play();
-            } else if (data.clock.time === "30") {
+            if (data.clock.time === "120") {
+                audio_endAutonomous.play();
+            } else if (data.clock.time === "0") {
+                audio_endTeleop.play();
+            } else if (data.clock.time === "140" || data.clock.time === "30") {
                 audio_30SecondsLeft.play();
             }
         }

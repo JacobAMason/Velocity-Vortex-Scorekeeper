@@ -9,6 +9,29 @@ String.prototype.toMMSS = function () {
     return minutes+':'+seconds;
 }
 
+function getScoreTableFromData(data) {
+    var tableData = new Array();
+    tableData.push("<thead><tr><th>Red Alliance</th><th>Blue Alliance</th></tr></thead><tbody><tr><th colspan='2'>Autonomous</th></tr><tr><td>Center Vortex: ");
+    tableData.push(data.red.autonomous.center);
+    tableData.push("</td><td>Center Vortex: ");
+    tableData.push(data.blue.autonomous.center);
+    tableData.push("</td></tr><tr><td>Corner Vortex: ");
+    tableData.push(data.red.autonomous.corner);
+    tableData.push("</td><td>Corner Vortex: ");
+    tableData.push(data.blue.autonomous.corner);
+    tableData.push("</td></tr><tr><th colspan='2'>TeleOp</th></tr><tr><td>Center Vortex: ");
+    tableData.push(data.red.teleop.center);
+    tableData.push("</td><td>Center Vortex: ");
+    tableData.push(data.blue.teleop.center);
+    tableData.push("</td></tr><tr><td>Corner Vortex: ");
+    tableData.push(data.red.teleop.corner);
+    tableData.push("</td><td>Corner Vortex: ");
+    tableData.push(data.blue.teleop.corner);
+    tableData.push("</td></tr></tbody></table>");
+
+    return tableData.join("");
+}
+
 var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
 ws.onopen = function() {
 };
@@ -36,13 +59,7 @@ ws.onmessage = function (evt) {
             $("#reset-clock").prop('disabled', true);
             $("#stop-clock").prop('disabled', false);
 
-            if (data.clock.time === "120") {
-                $("#start-autonomous").prop('disabled', true);
-                $("#start-teleop").prop('disabled', false);
-                $("#reset-clock").prop('disabled', false);
-                $("#stop-clock").prop('disabled', true);
-            }
-            if (data.clock.time === "0") {
+            if (data.clock.time === "120" || data.clock.time === "0") {
                 $("#start-autonomous").prop('disabled', false);
                 $("#start-teleop").prop('disabled', false);
                 $("#reset-clock").prop('disabled', false);
@@ -50,26 +67,7 @@ ws.onmessage = function (evt) {
             }
         }
     } else {
-        var tableData = new Array();
-        tableData.push("<thead><tr><th>Red Alliance</th><th>Blue Alliance</th></tr></thead><tbody><tr><th colspan='2'>Autonomous</th></tr><tr><td>Center Vortex - ");
-        tableData.push(data.red.autonomous.center);
-        tableData.push("</td><td>Center Vortex - ");
-        tableData.push(data.blue.autonomous.center);
-        tableData.push("</td></tr><tr><td>Corner Vortex - ");
-        tableData.push(data.red.autonomous.corner);
-        tableData.push("</td><td>Corner Vortex - ");
-        tableData.push(data.blue.autonomous.corner);
-        tableData.push("</td></tr><tr><th colspan='2'>TeleOp</th></tr><tr><td>Center Vortex - ");
-        tableData.push(data.red.teleop.center);
-        tableData.push("</td><td>Center Vortex - ");
-        tableData.push(data.blue.teleop.center);
-        tableData.push("</td></tr><tr><td>Corner Vortex - ");
-        tableData.push(data.red.teleop.corner);
-        tableData.push("</td><td>Corner Vortex - ");
-        tableData.push(data.blue.teleop.corner);
-        tableData.push("</td></tr></tbody></table>");
-
-        $("#scores").html(tableData.join(""));
+        $("#scores").html(getScoreTableFromData(data));
     }
 };
 
@@ -102,5 +100,16 @@ $('[data-toggle=confirmation]').confirmation({
   rootSelector: '[data-toggle=confirmation]',
   // other options
 });
+
+$("#clear-scores").on("confirmed.bs.confirmation", function() {
+    $.ajax({
+        url: "/scorekeeper/reset",
+        type: "POST",
+        data: JSON.stringify({reset: "reset"}),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function () {console.log("Success")}
+    });
+})
 
 });

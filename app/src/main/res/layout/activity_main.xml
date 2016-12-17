@@ -9,45 +9,8 @@
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="25dp"
+        android:layout_margin="12pt"
         android:background="#DAFFFFFF">
-
-        <RadioGroup
-            android:id="@+id/radioGroup_gameMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/spinner_scoringStyle"
-            android:layout_marginEnd="15dp"
-            android:checkedButton="@+id/radioButton_Autonomous"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/radioButton_Autonomous"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Autonomous"
-                android:textSize="18sp" />
-
-            <RadioButton
-                android:id="@+id/radioButton_teleOp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Teleop"
-                android:textSize="18sp" />
-        </RadioGroup>
-
-        <Spinner
-            android:id="@+id/spinner_scoringStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="194dp"
-            android:entries="@array/scoring_styles"
-            android:spinnerMode="dialog" />
 
         <Button
             android:id="@+id/button_startScoring"
@@ -56,31 +19,67 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:text="Start Scoring"
-            android:textSize="24sp"
+            android:textSize="15pt"
             style="@style/Widget.AppCompat.Button.Colored"/>
-
-        <EditText
-            android:id="@+id/editText_ipAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/radioGroup_gameMode"
-            android:layout_alignEnd="@+id/radioGroup_gameMode"
-            android:layout_marginBottom="54dp"
-            android:layout_marginEnd="14dp"
-            android:hint="IP address"
-            android:inputType="phone" />
 
         <TextView
             android:text="FTC Scorekeeper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5pt"
             android:id="@+id/textView_title"
-            android:textSize="36sp"
             android:textColor="@android:color/black"
             android:fontFamily="sans-serif"
             android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="16pt" />
+
+        <EditText
+            android:id="@+id/editText_ipAddress"
+            android:textSize="12pt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="35pt"
+            android:hint="IP address"
+            android:inputType="phone"
+            android:layout_above="@+id/button_startScoring"
             android:layout_centerHorizontal="true" />
+
+        <Spinner
+            android:id="@+id/spinner_scoringStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35pt"
+            android:entries="@array/scoring_styles"
+            android:spinnerMode="dialog"
+            android:layout_below="@+id/textView_title"
+            android:layout_centerHorizontal="true" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup_gameMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkedButton="@+id/radioButton_Autonomous"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true">
+
+            <RadioButton
+                android:id="@+id/radioButton_Autonomous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Autonomous"
+                android:textSize="12pt" />
+
+            <RadioButton
+                android:id="@+id/radioButton_teleOp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Teleop"
+                android:textSize="12pt" />
+        </RadioGroup>
 
     </RelativeLayout>
 </FrameLayout>
