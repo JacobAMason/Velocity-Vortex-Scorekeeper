@@ -4,7 +4,6 @@ var audio_startTeleop = new Audio('sound/startteleop.wav');
 var audio_endTeleop = new Audio('sound/endteleop.wav');
 var audio_30SecondsLeft = new Audio('sound/30sec.wav');
 var audio_eStop = new Audio('sound/estop.wav');
-var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
 
 $(document).ready(function(){
 
@@ -29,7 +28,7 @@ String.prototype.toMMSS = function () {
     return minutes+':'+seconds;
 }
 
-
+var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
 ws.onmessage = function (evt) {
     var data = JSON.parse(evt.data);
 
@@ -68,4 +67,5 @@ ws.onmessage = function (evt) {
         $("#teleop-red-corner").html(data.red.teleop.corner);
     }
 };
+
 });

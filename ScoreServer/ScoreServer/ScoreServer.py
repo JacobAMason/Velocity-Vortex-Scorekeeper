@@ -22,6 +22,7 @@ def handle_websocket():
     wsock = request.environ.get('wsgi.websocket')
     if not wsock:
         abort(400, 'Expected WebSocket request.')
+    print "Accepted new connection. Sending current scores."
     wsock.send(scorekeeper.get_score_json())
     scorekeeper.connections.add(wsock)
 

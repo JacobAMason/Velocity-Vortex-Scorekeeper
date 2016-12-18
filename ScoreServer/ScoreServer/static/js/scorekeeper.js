@@ -33,8 +33,6 @@ function getScoreTableFromData(data) {
 }
 
 var ws = new WebSocket("ws://" + location.host + "/scorekeeper/ws");
-ws.onopen = function() {
-};
 ws.onmessage = function (evt) {
     var data = JSON.parse(evt.data);
 
