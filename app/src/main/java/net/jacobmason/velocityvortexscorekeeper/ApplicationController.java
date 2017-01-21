@@ -3,8 +3,10 @@ package net.jacobmason.velocityvortexscorekeeper;
 import android.app.Application;
 import android.util.Log;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import org.java_websocket.WebSocket;
+
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.client.StompClient;
 
 /**
  * Created by jacob on 12/14/16.
@@ -12,13 +14,11 @@ import com.android.volley.toolbox.Volley;
 
 public class ApplicationController extends Application {
     private static ApplicationController instance;
-    private RequestQueue requestQueue;
+    private StompClient stompClient;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        Log.d("ApplicationController", "Created");
         instance = this;
     }
 
@@ -26,10 +26,15 @@ public class ApplicationController extends Application {
         return instance;
     }
 
-    public RequestQueue getRequestQueue() {
-        if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(getApplicationContext());
+    public StompClient getStompClient(String ipAddress) {
+        if (stompClient == null || !stompClient.isConnected()) {
+            // SockJS has a .../websocket path on the socket for clients that aren't running SockJS,
+            // but can support WebSockets.
+            String address = "ws://" + ipAddress + ":3486/scorekeeper/ws/websocket";
+            Log.d("ApplicationController", "Creating Stomp Client at " + address);
+            stompClient = Stomp.over(WebSocket.class, address);
+            stompClient.connect();
         }
-        return requestQueue;
+        return stompClient;
     }
 }

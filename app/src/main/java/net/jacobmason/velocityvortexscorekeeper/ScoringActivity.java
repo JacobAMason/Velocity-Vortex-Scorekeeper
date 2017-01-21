@@ -12,17 +12,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.Locale;
+
+import rx.functions.Action1;
+import ua.naiksoftware.stomp.LifecycleEvent;
+import ua.naiksoftware.stomp.client.StompClient;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -32,6 +33,8 @@ public class ScoringActivity extends AppCompatActivity {
     private TableLayout scoringTable;
     private String webserverIP;
     private String gameMode;
+    private String scoringStyle;
+    private StompClient stompClient;
 
     @Override
     public void onBackPressed() {
@@ -55,11 +58,47 @@ public class ScoringActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setActivityProperties();
+        getParametersFromPreviousActivity();
 
-        Log.d("ScoringActivity", "Created Activity");
+        stompClient = ApplicationController.get_instance().getStompClient(webserverIP);
+        stompClient.lifecycle().subscribe(new Action1<LifecycleEvent>() {
+            @Override
+            public void call(LifecycleEvent lifecycleEvent) {
+                switch (lifecycleEvent.getType()) {
+                    case OPENED:
+                        ScoringActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Connected to Server", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        break;
 
+                    case ERROR:
+                        Log.d("Stomp", lifecycleEvent.getException().toString());
+                        break;
+
+                    case CLOSED:
+                        ScoringActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Disconnected from Server", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        break;
+                }
+            }
+        });
+
+        TextView gameClock = (TextView) findViewById(R.id.gameClock);
+
+        addScoringButtonsToActivity(scoringStyle);
+    }
+
+    private void setActivityProperties() {
         setContentView(R.layout.activity_scoring_screen);
-        scoringTable = (TableLayout) findViewById(R.id.relativeLayout);
+        scoringTable = (TableLayout) findViewById(R.id.scoringTable);
         scoringTable.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -70,13 +109,18 @@ public class ScoringActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
 
+    private void getParametersFromPreviousActivity() {
         webserverIP = getIntent().getStringExtra("ip_address");
         gameMode = getIntent().getStringExtra("game_mode");
+        scoringStyle = getIntent().getStringExtra("scoring_style");
+    }
 
+    private void addScoringButtonsToActivity(String scoringStyle) {
         View topPadding = findViewById(R.id.topPadding);
         View bottomPadding = findViewById(R.id.bottomPadding);
-        switch (getIntent().getStringExtra("scoring_style")) {
+        switch (scoringStyle) {
             case "Red":
                 topPadding.setBackgroundResource(R.color.red);
                 scoringTable.addView(new ScoringButton(this, "Red", "Center"));
@@ -188,7 +232,6 @@ public class ScoringActivity extends AppCompatActivity {
 
         private void update_score() {
             if (!webserverIP.isEmpty()) {
-                final String address = String.format(Locale.US, "http://%s:3486/scorekeeper/submit", webserverIP);
                 try {
                     JSONObject params = new JSONObject();
                     params.put("gameMode", gameMode.toLowerCase());
@@ -196,21 +239,7 @@ public class ScoringActivity extends AppCompatActivity {
                     params.put("goal", goal.toLowerCase());
                     params.put("score", score);
 
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, address, params,
-                            new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("ScoringActivity", error.toString());
-                                    Toast.makeText(getApplicationContext(), "Error sending score to server\nCheck your IP address and connectivity", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                    ApplicationController.get_instance().getRequestQueue().add(request);
+                    stompClient.send("/topic/scores", Arrays.asList(params).toString()).subscribe();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
