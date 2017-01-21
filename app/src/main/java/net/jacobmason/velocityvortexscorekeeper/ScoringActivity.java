@@ -24,6 +24,7 @@ import java.util.Locale;
 import rx.functions.Action1;
 import ua.naiksoftware.stomp.LifecycleEvent;
 import ua.naiksoftware.stomp.client.StompClient;
+import ua.naiksoftware.stomp.client.StompMessage;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -60,7 +61,32 @@ public class ScoringActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setActivityProperties();
         getParametersFromPreviousActivity();
+        setupStompConnection();
+        addScoringButtonsToActivity(scoringStyle);
+    }
 
+    private void setActivityProperties() {
+        setContentView(R.layout.activity_scoring_screen);
+        scoringTable = (TableLayout) findViewById(R.id.scoringTable);
+        scoringTable.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void getParametersFromPreviousActivity() {
+        webserverIP = getIntent().getStringExtra("ip_address");
+        gameMode = getIntent().getStringExtra("game_mode");
+        scoringStyle = getIntent().getStringExtra("scoring_style");
+    }
+
+    private void setupStompConnection() {
         stompClient = ApplicationController.get_instance().getStompClient(webserverIP);
         stompClient.lifecycle().subscribe(new Action1<LifecycleEvent>() {
             @Override
@@ -90,31 +116,34 @@ public class ScoringActivity extends AppCompatActivity {
                 }
             }
         });
-
-        TextView gameClock = (TextView) findViewById(R.id.gameClock);
-
-        addScoringButtonsToActivity(scoringStyle);
+        stompClient.topic("/topic/clock/time").subscribe(new Action1<StompMessage>() {
+            @Override
+            public void call(StompMessage clockTimeMessage) {
+                try {
+                    setClockTime(new JSONObject(clockTimeMessage.getPayload()).get("time").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    private void setActivityProperties() {
-        setContentView(R.layout.activity_scoring_screen);
-        scoringTable = (TableLayout) findViewById(R.id.scoringTable);
-        scoringTable.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+    private void setClockTime(String time) {
+        final TextView gameClock = (TextView) findViewById(R.id.gameClock);
+        int seconds = Integer.parseInt(time);
+        int minutes = seconds / 60;
+        seconds %= 60;
+        StringBuilder displayTimeBuilder = new StringBuilder().append(minutes).append(":");
+        if (seconds < 10) {
+            displayTimeBuilder.append(0);
         }
-    }
-
-    private void getParametersFromPreviousActivity() {
-        webserverIP = getIntent().getStringExtra("ip_address");
-        gameMode = getIntent().getStringExtra("game_mode");
-        scoringStyle = getIntent().getStringExtra("scoring_style");
+        final String displayTime = displayTimeBuilder.append(seconds).toString();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                gameClock.setText(displayTime);
+            }
+        });
     }
 
     private void addScoringButtonsToActivity(String scoringStyle) {

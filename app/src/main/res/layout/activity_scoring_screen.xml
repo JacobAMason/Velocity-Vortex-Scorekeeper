@@ -13,15 +13,35 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/gameClock"
-            android:layout_width="wrap_content"
+            android:id="@+id/gameMode"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:text="Mode?"
             android:textColor="@android:color/white"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:layout_weight="2"/>
+
+        <TextView
+            android:id="@+id/gameClock"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:text="-:--"
+            android:textColor="@android:color/white"
             android:textSize="35dp"
-            android:layout_marginTop="-5dp"
-            android:layout_marginLeft="5dp"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
             android:layout_weight="1"/>
+
+        <!--This Text View is just for spacing right now. If I have more content to include, it can go here-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@android:color/white"
+            android:textSize="20dp"
+            android:layout_weight="2"/>
     </LinearLayout>
 
     <View
