@@ -126,6 +126,23 @@ public class ScoringActivity extends AppCompatActivity {
                 }
             }
         });
+        stompClient.topic("/topic/clock/control").subscribe(new Action1<StompMessage>() {
+            @Override
+            public void call(StompMessage clockControlMessage) {
+                try {
+                    final TextView gameMode = (TextView) findViewById(R.id.gameMode);
+                    final String clockMode = new JSONObject(clockControlMessage.getPayload()).get("control").toString();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            gameMode.setText(clockMode);
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void setClockTime(String time) {
