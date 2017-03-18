@@ -1,4 +1,4 @@
-package net.jacobmason.velocityvortexscorekeeper;
+package net.jacobmason.counter;
 
 import android.content.Context;
 import android.os.Bundle;

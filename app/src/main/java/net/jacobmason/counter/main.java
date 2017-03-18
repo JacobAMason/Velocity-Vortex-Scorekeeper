@@ -1,4 +1,4 @@
-package net.jacobmason.velocityvortexscorekeeper;
+package net.jacobmason.counter;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;

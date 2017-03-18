@@ -1,4 +1,4 @@
-package net.jacobmason.velocityvortexscorekeeper;
+package net.jacobmason.counter;
 
 import org.junit.Test;
 
