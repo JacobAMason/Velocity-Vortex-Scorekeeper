@@ -79,7 +79,7 @@ public class main extends AppCompatActivity {
         final EditText editText_ipAddress = (EditText) findViewById(R.id.editText_ipAddress);
         editText_ipAddress.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void beforeTextChanged(CharSequence s,int start,int count,int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             private String mPreviousText = "";
             @Override
@@ -92,7 +92,8 @@ public class main extends AppCompatActivity {
             }
         });
 
-        final RadioGroup switch_gameMode = (RadioGroup) findViewById(R.id.radioGroup_gameMode);
+        final RadioGroup switch_division = (RadioGroup) findViewById(R.id.radioGroup_division);
+        final RadioGroup switch_field = (RadioGroup) findViewById(R.id.radioGroup_field);
         final Button button_startScoring = (Button) findViewById(R.id.button_startScoring);
         final Intent swapToScoringActivity = new Intent(this, ScoringActivity.class);
         button_startScoring.setOnClickListener(new View.OnClickListener() {
@@ -103,10 +104,12 @@ public class main extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Not a valid IP address", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String game_mode = ((RadioButton) findViewById(switch_gameMode.getCheckedRadioButtonId())).getText().toString();
+                String division = ((RadioButton) findViewById(switch_division.getCheckedRadioButtonId())).getText().toString();
+                String field = ((RadioButton) findViewById(switch_field.getCheckedRadioButtonId())).getText().toString();
                 String scoring_style = ((Spinner) findViewById(R.id.spinner_scoringStyle)).getSelectedItem().toString();
                 swapToScoringActivity.putExtra("ip_address", ipAddress);
-                swapToScoringActivity.putExtra("game_mode", game_mode);
+                swapToScoringActivity.putExtra("division", division);
+                swapToScoringActivity.putExtra("field", field);
                 swapToScoringActivity.putExtra("scoring_style", scoring_style);
                 startActivity(swapToScoringActivity);
             }

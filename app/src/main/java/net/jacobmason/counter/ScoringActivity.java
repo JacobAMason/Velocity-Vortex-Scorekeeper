@@ -33,9 +33,11 @@ import ua.naiksoftware.stomp.client.StompMessage;
 public class ScoringActivity extends AppCompatActivity {
     private TableLayout scoringTable;
     private String webserverIP;
-    private String gameMode;
+    private String division;
+    private String field;
     private String scoringStyle;
     private StompClient stompClient;
+    private int secondsGlobal;
 
     @Override
     public void onBackPressed() {
@@ -82,12 +84,17 @@ public class ScoringActivity extends AppCompatActivity {
 
     private void getParametersFromPreviousActivity() {
         webserverIP = getIntent().getStringExtra("ip_address");
-        gameMode = getIntent().getStringExtra("game_mode");
+        division = getIntent().getStringExtra("division");
+        field = getIntent().getStringExtra("field");
         scoringStyle = getIntent().getStringExtra("scoring_style");
     }
 
     private void setupStompConnection() {
-        stompClient = ApplicationController.get_instance().getStompClient(webserverIP);
+        int divisionNum = division.equals("Division 1") ? 1 : 2;
+        int fieldNum = field.equals("Field 1") ? 1 : 2;
+        final String port = String.valueOf(1111 * ((divisionNum-1) * 2 + fieldNum));
+
+        stompClient = ApplicationController.get_instance().getStompClient(webserverIP, port);
         stompClient.lifecycle().subscribe(new Action1<LifecycleEvent>() {
             @Override
             public void call(LifecycleEvent lifecycleEvent) {
@@ -109,7 +116,7 @@ public class ScoringActivity extends AppCompatActivity {
                         ScoringActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), "Disconnected from Server", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Disconnected from Server at " + division + field, Toast.LENGTH_SHORT).show();
                             }
                         });
                         break;
@@ -126,6 +133,7 @@ public class ScoringActivity extends AppCompatActivity {
                 }
             }
         });
+
         stompClient.topic("/topic/clock/control").subscribe(new Action1<StompMessage>() {
             @Override
             public void call(StompMessage clockControlMessage) {
@@ -148,6 +156,22 @@ public class ScoringActivity extends AppCompatActivity {
     private void setClockTime(String time) {
         final TextView gameClock = (TextView) findViewById(R.id.gameClock);
         int seconds = Integer.parseInt(time);
+        secondsGlobal = seconds;
+
+        if (seconds == 150 || seconds == 119) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < scoringTable.getChildCount(); i++) {
+                        View v = scoringTable.getChildAt(i);
+                        if (v instanceof ScoringButton) {
+                            ((ScoringButton) v).setScore(0);
+                        }
+                    }
+                }
+            });
+        }
+
         int minutes = seconds / 60;
         seconds %= 60;
         StringBuilder displayTimeBuilder = new StringBuilder().append(minutes).append(":");
@@ -229,13 +253,15 @@ public class ScoringActivity extends AppCompatActivity {
     class ScoringButton extends TableRow {
         private String alliance;
         private String goal;
+        private final String goalName;
+        final Button button;
         private int score = 0;
 
         public ScoringButton(Context context, final String alliance, String goal) {
             super(context);
             this.alliance = alliance;
             this.goal = goal;
-            final String goalName = String.format(Locale.US, "%s %s Goal", alliance, goal);
+            goalName = String.format(Locale.US, "%s %s Goal", alliance, goal);
             int backgroundColor;
             switch (alliance) {
                 case "Red":
@@ -253,23 +279,21 @@ public class ScoringActivity extends AppCompatActivity {
             this.setLayoutParams(params);
             this.setBackgroundResource(backgroundColor);
 
-            final Button button = (Button) getLayoutInflater().inflate(R.layout.scoring_button, this, false);
+            button = (Button) getLayoutInflater().inflate(R.layout.scoring_button, this, false);
             button.setText(String.format(Locale.US, "%s\n0", goalName));
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    button.setText(String.format(Locale.US, "%s\n%d", goalName, ++score));
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-                    update_score();
+                    setScore(++score);
                 }
             });
             button.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     if (score > 0) {
-                        button.setText(String.format(Locale.US, "%s\n%d", goalName, --score));
+                        setScore(--score);
                     }
-                    update_score();
                     return true;
                 }
             });
@@ -277,10 +301,23 @@ public class ScoringActivity extends AppCompatActivity {
         }
 
         private void update_score() {
+            if (secondsGlobal == 150) {
+                sendScore("autonomous");
+                sendScore("teleop");
+//                score = 0;
+//                button.setText(String.format(Locale.US, "%s\n%d", goalName, 0));
+            } else if (secondsGlobal >= 120) {
+                sendScore("autonomous");
+            } else {
+                sendScore("teleop");
+            }
+        }
+
+        private void sendScore(String gameMode) {
             if (!webserverIP.isEmpty()) {
                 try {
                     JSONObject params = new JSONObject();
-                    params.put("gameMode", gameMode.toLowerCase());
+                    params.put("gameMode", gameMode);
                     params.put("alliance", alliance.toLowerCase());
                     params.put("goal", goal.toLowerCase());
                     params.put("score", score);
@@ -294,6 +331,12 @@ public class ScoringActivity extends AppCompatActivity {
 
         public int getScore() {
             return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
+            button.setText(String.format(Locale.US, "%s\n%d", goalName, score));
+            update_score();
         }
     }
 }

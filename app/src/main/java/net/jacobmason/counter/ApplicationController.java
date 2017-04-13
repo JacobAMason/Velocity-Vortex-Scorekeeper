@@ -26,11 +26,11 @@ public class ApplicationController extends Application {
         return instance;
     }
 
-    public StompClient getStompClient(String ipAddress) {
+    public StompClient getStompClient(String ipAddress, String port) {
         if (stompClient == null || !stompClient.isConnected()) {
             // SockJS has a .../websocket path on the socket for clients that aren't running SockJS,
             // but can support WebSockets.
-            String address = "ws://" + ipAddress + ":3486/scorekeeper/ws/websocket";
+            String address = "ws://" + ipAddress + ":" + port +  "/scorekeeper/ws/websocket";
             Log.d("ApplicationController", "Creating Stomp Client at " + address);
             stompClient = Stomp.over(WebSocket.class, address);
             stompClient.connect();
