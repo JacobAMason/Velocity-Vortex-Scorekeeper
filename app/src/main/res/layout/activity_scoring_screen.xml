@@ -35,13 +35,14 @@
 
         <!--This Text View is just for spacing right now. If I have more content to include, it can go here-->
         <TextView
+            android:id="@+id/connectionStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="2"
             android:gravity="center"
-            android:text=""
+            android:text="Unknown"
             android:textColor="@android:color/white"
-            android:textSize="20dp"
-            android:layout_weight="2"/>
+            android:textSize="20dp" />
     </LinearLayout>
 
     <View

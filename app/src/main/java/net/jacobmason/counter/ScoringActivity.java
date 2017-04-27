@@ -98,12 +98,13 @@ public class ScoringActivity extends AppCompatActivity {
         stompClient.lifecycle().subscribe(new Action1<LifecycleEvent>() {
             @Override
             public void call(LifecycleEvent lifecycleEvent) {
+                final TextView connectionStatus = (TextView) findViewById(R.id.connectionStatus);
                 switch (lifecycleEvent.getType()) {
                     case OPENED:
                         ScoringActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), "Connected to Server", Toast.LENGTH_SHORT).show();
+                                connectionStatus.setText("Connected");
                             }
                         });
                         break;
@@ -116,9 +117,10 @@ public class ScoringActivity extends AppCompatActivity {
                         ScoringActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), "Disconnected from Server at " + division + field, Toast.LENGTH_SHORT).show();
+                                connectionStatus.setText("Disconnected");
                             }
                         });
+                        setupStompConnection();
                         break;
                 }
             }
